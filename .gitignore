@@ -1,0 +1,5 @@
+/.vs
+/test/x64/
+/x64/
+/spell-checker.vcxproj.user
+/test/test.vcxproj.user
