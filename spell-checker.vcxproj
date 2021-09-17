@@ -142,11 +142,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="spell-checker.cpp" />
-    <ClCompile Include="SpellChecker.cpp" />
+    <ClCompile Include="TextSpellChecker.cpp" />
+    <ClCompile Include="WordSpellChecker.cpp" />
     <ClCompile Include="Trie.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SpellChecker.h" />
+    <ClInclude Include="TextSpellChecker.h" />
+    <ClInclude Include="WordSpellChecker.h" />
     <ClInclude Include="Trie.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

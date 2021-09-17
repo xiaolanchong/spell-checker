@@ -33,11 +33,11 @@ changes on each word, W:
 
 rain spain plain plaint pain main mainly
 the in on fall falls his was
-===
+\===
 hte rame in pain fells
 mainy oon teh lain
 was hints pliant
-===
+\===
 
 **Output**
 

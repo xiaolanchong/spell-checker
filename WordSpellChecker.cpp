@@ -1,11 +1,21 @@
-#include "SpellChecker.h"
+#include "WordSpellChecker.h"
 #include <cassert>
 #include <thread>
+#include <future>
 
 namespace
 {
 
-using StringSet = SpellChecker::StringSet;
+using StringSet = WordSpellChecker::StringSet;
+
+
+template<class It>
+constexpr void advanceWithEndChecking(It& it, size_t n, It end)
+{
+   for (size_t i = 0; i < n && it != end; ++i, ++it)
+   {
+   }
+}
 
 void createDeletionMasks(const std::string& word, StringSet& oneCorrectionMask, StringSet& twoCorrectionsMask)
 {
@@ -75,7 +85,7 @@ void createInsertionAndDeletionMasks(const std::string& word, StringSet& twoCorr
 
 }
 
-SpellChecker::StringSetPair SpellChecker::CreateMasks(const std::string& word)
+WordSpellChecker::StringSetPair WordSpellChecker::CreateMasks(const std::string& word)
 {
    StringSet oneCorrectionMask;
    StringSet twoCorrectionsMask;
@@ -86,7 +96,7 @@ SpellChecker::StringSetPair SpellChecker::CreateMasks(const std::string& word)
    return { oneCorrectionMask, twoCorrectionsMask };
 }
 
-SpellChecker::SpellCheckingRes SpellChecker::CheckSpelling(const std::string& word) const
+WordSpellChecker::SpellCheckingRes WordSpellChecker::CheckSpelling(const std::string& word) const
 {
    const StringVec exactMatching = m_trie.FindAll(word);
    if (!exactMatching.empty())
@@ -96,55 +106,57 @@ SpellChecker::SpellCheckingRes SpellChecker::CheckSpelling(const std::string& wo
    }
 
    const auto& [oneCorrectionMask, twoCorrectionsMask] = CreateMasks(word);
-
-   StringSet candidates;
-   for (const auto& mask : oneCorrectionMask)
-   {
-      StringVec oneCorrections = m_trie.FindAll(mask);
-      candidates.insert(oneCorrections.begin(), oneCorrections.end());
-   }
-
-   if(!candidates.empty())
+   auto candidates = checkSpellingAsync(oneCorrectionMask);
+   if (!candidates.empty())
    {
       return { Correction::One, candidates };
    }
 
-   for (const auto& mask : twoCorrectionsMask)
-   {
-      StringVec twoCorrections = m_trie.FindAll(mask);
-      candidates.insert(twoCorrections.begin(), twoCorrections.end());
-   }
-
-   return { Correction::Two, candidates};
+   candidates = checkSpellingAsync(twoCorrectionsMask);
+   return { Correction::Two, candidates };
 }
 
-#if 0
-SpellChecker::StringSet SpellChecker::checkSpellingAsync(const StringSet& masks) const
+WordSpellChecker::StringSet WordSpellChecker::checkMasks(const StringSet& masks) const
 {
-   std::promise<StringSet> candidatePromise;
-   std::futures<StringSet> candidateFuture = candidatePromise.get_future();
-   std::vector<std::thread> threads;
-   for (auto first = masks.begin(); first != masks.end();)
+   StringSet candidates;
+   for (const auto& mask : masks)
    {
-      auto end = first;
-      std::advance(end, masks.size() / 4);
-
-      StringSet myMasks = StringSet(first, end);
-      first = end;
-      threads.emplace_back(std::thread([myMasks = std::move(myMasks), &m_trie]()
-      {
-         StringSet candidates;
-         for (const auto& mask : myMasks)
-         {
-            StringVec corrections = m_trie.FindAll(mask);
-            candidates.insert(corrections.begin(), corrections.end());
-         }
-         //StringVec oneCorrections = m_trie.FindAll(mask);
-        // candidates.insert(oneCorrections.begin(), oneCorrections.end());
-      }));
-
-      
+      StringVec corrections = m_trie.FindAll(mask);
+      candidates.insert(corrections.begin(), corrections.end());
    }
+   return candidates;
 }
 
-#endif
+WordSpellChecker::StringSet WordSpellChecker::checkSpellingAsync(const StringSet& masks) const
+{
+   const size_t maskNumberInChunk = 10;
+
+   if (masks.size() <= maskNumberInChunk)
+   {
+      return checkMasks(masks);
+   }
+
+   std::vector<std::future<StringSet>> tasks;
+   for (auto start = masks.begin(); start != masks.end();)
+   {
+      auto end = start;
+      advanceWithEndChecking(end, maskNumberInChunk, masks.end());
+
+      StringSet myMasks(start, end);
+      start = end;
+
+      auto fut = std::async(std::launch::async, [myMasks=std::move(myMasks), this]()
+      {
+         return checkMasks(myMasks);
+      });
+      tasks.emplace_back(std::move(fut));
+   }
+
+   StringSet result;
+   for (auto& task : tasks)
+   {
+      StringSet taskResult = task.get();
+      result.insert(taskResult.begin(), taskResult.end());
+   }
+   return result;
+}

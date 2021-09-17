@@ -21,7 +21,10 @@
     <ClCompile Include="Trie.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SpellChecker.cpp">
+    <ClCompile Include="WordSpellChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextSpellChecker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,7 +32,10 @@
     <ClInclude Include="Trie.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SpellChecker.h">
+    <ClInclude Include="WordSpellChecker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextSpellChecker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

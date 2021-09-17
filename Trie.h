@@ -18,7 +18,7 @@ public:
    using StringVec = std::vector<std::string>;
    using FnFound = std::function<void(const std::string&)>;
 
-   static const char sc_anyLetter = '*';
+   static const char sc_anyLetter = '?';
 
    explicit TrieNode(char letter)
       : m_letter(letter) 

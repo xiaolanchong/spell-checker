@@ -3,3 +3,4 @@
 /x64/
 /spell-checker.vcxproj.user
 /test/test.vcxproj.user
+/test/out/
