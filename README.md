@@ -20,7 +20,7 @@ As output, you should print the text lines with whitespace intact, with the foll
 changes on each word, W:
 * If W is in the dictionary, print it as is.
 * Otherwise, if W is not in the dictionary,
-   – If no corrections can be found, print “{W?}”.
+   – If no corrections can be found, print {W?}.
    – Ignore any corrections that require two edits if there is at least one that requires
      only one edit; then
    – If exactly one correction is left, print that word.
@@ -33,10 +33,13 @@ changes on each word, W:
 
 rain spain plain plaint pain main mainly
 the in on fall falls his was
+
 \===
+
 hte rame in pain fells
 mainy oon teh lain
 was hints pliant
+
 \===
 
 **Output**
