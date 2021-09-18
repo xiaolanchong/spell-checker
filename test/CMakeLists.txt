@@ -22,3 +22,7 @@ include_directories(../googletest/googletest/include
                     ../googletest/googletest)
 add_executable(test ${headers} ${sources})
 target_compile_features(test PRIVATE cxx_std_17)
+if(UNIX)
+  target_link_libraries(test "-lpthread")
+  set_target_properties(test PROPERTIES COMPILE_FLAGS ${compiler_flags})
+endif()

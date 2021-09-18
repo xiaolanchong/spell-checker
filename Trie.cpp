@@ -122,9 +122,8 @@ void TrieNode::FindAll(const std::string& matchedSoFar, const std::string& word,
    }
 }
 
-void TrieNode::Print(std::ostream& os) const
+void TrieNode::Print(std::ostream& /*os*/) const
 {
-   os;
 }
 
 

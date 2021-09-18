@@ -23,3 +23,5 @@
 /test/cmake_install.cmake
 /test/CMakeFiles/
 /test/
+Makefile
+spell-checker

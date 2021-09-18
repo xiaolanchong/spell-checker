@@ -1,5 +1,6 @@
 #include "TextSpellChecker.h"
 #include <iostream>
+#include <iterator>
 #include <fstream>
 #include <sstream>
 #include <string>
