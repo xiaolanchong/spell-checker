@@ -8,7 +8,7 @@
 namespace
 {
 
-const size_t gc_maxLinesInFile = 2000;
+const size_t gc_maxLinesInFile = 10000;
 const size_t gc_maxWordLength = 50;
 
 /// <summary>

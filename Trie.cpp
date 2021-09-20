@@ -15,15 +15,10 @@ void Trie::Add(const std::string& word)
    m_root.AddSuffix(word);
 }
 
-void Trie::Print(std::ostream& os) const
-{
-   m_root.Print(os);
-}
-
-Trie::StringVec Trie::FindAll(const std::string& word) const
+Trie::StringVec Trie::FindAll(const std::string& mask) const
 {
    StringVec result;
-   m_root.FindAll({}, word,
+   m_root.FindAll({}, mask,
       [&result](const std::string& foundWord)
    {
       result.push_back(foundWord);
@@ -89,9 +84,9 @@ TrieNode::FoundAndWhere TrieNode::findChildOrWhereToInsert(char letter)
    return std::make_pair(false, itEqualOrGreater);
 }
 
-void TrieNode::FindAll(const std::string& matchedSoFar, const std::string& word, const FnFound& onFound) const
+void TrieNode::FindAll(const std::string& matchedSoFar, const std::string& mask, const FnFound& onFound) const
 {
-   if (word.empty())
+   if (mask.empty())
    {
       if (m_canBeTerminal)
       {
@@ -100,8 +95,8 @@ void TrieNode::FindAll(const std::string& matchedSoFar, const std::string& word,
       return;
    }
 
-   const auto letter = word[0];
-   const auto rest = word.substr(1);
+   const auto letter = mask[0];
+   const auto rest = mask.substr(1);
 
    if (letter == sc_anyLetter)
    {
@@ -121,12 +116,6 @@ void TrieNode::FindAll(const std::string& matchedSoFar, const std::string& word,
       }
    }
 }
-
-void TrieNode::Print(std::ostream& /*os*/) const
-{
-}
-
-
 
 }
 

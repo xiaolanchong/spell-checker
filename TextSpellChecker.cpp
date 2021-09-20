@@ -11,18 +11,30 @@ bool isLetter(char symbol)
           ('A' <= symbol && symbol <= 'Z');
 }
 
-std::string join(const WordSpellChecker::StringSet& words)
+std::string recoverCapital(const std::string& word, bool isCapital)
+{
+   if (!isCapital || word.empty())
+      return word;
+
+   auto capitalizedWord(word);
+   capitalizedWord[0] = static_cast<char>(std::toupper(capitalizedWord[0]));
+   return capitalizedWord;
+}
+
+std::string join(const WordSpellChecker::StringSet& words, bool isCapital)
 {
    if (words.empty())
       return {};
 
    if (words.size() == 1)
-      return *words.cbegin();
+   {
+      return recoverCapital(*words.cbegin(), isCapital);
+   }
 
    std::string res = "{";
    for (const auto& word: words)
    {
-      res += word;
+      res += recoverCapital(word, isCapital);
       res += ' ';
    }
    res.back() = '}';
@@ -32,25 +44,28 @@ std::string join(const WordSpellChecker::StringSet& words)
 
 std::string outputCorrection(const std::string& word, const WordSpellChecker::SpellCheckingRes& corrections)
 {
+   const bool isCapital = !word.empty() ? !std::islower(word[0]) : false;
    const auto& [correctionType, suggestions] = corrections;
    switch (correctionType)
    {
    case WordSpellChecker::Correction::No:
+   {
       assert(suggestions.size() == 1);
-      return *suggestions.cbegin();
+      return recoverCapital(word, isCapital);
+   }
 
    case WordSpellChecker::Correction::One:
-      return join(suggestions);
+      return join(suggestions, isCapital);
 
    case WordSpellChecker::Correction::Two:
       if (suggestions.empty())
       {
          std::string out("{");
-         out += word;
+         out += recoverCapital(word, isCapital);
          out += "?}";
          return out;
       }
-      return join(suggestions);
+      return join(suggestions, isCapital);
 
    default:
       assert(!"Unknown correction type");
@@ -152,7 +167,7 @@ std::string TextSpellChecker::CheckText(const std::string& text) const
          std::transform(lowerText.begin(), lowerText.end(), lowerText.begin(),
             [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
-         const auto res = m_wordChecker.CheckSpelling(tokenText);
+         const auto res = m_wordChecker.CheckSpelling(lowerText);
          const auto toOutput = outputCorrection(tokenText, res);
          output += toOutput;
          break;

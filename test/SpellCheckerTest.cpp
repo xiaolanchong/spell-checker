@@ -100,6 +100,14 @@ TEST(SpellCheckerTest, SimpleText)
    EXPECT_EQ("{i?} know how\nto parse", res);
 }
 
+TEST(SpellCheckerTest, CaseInsensitive)
+{
+   TextSpellChecker checker;
+   checker.AddWordToDictionary({ "know", "how", "to", "parse" });
+   auto res = checker.CheckText("Know How is to pArse");
+   EXPECT_EQ("Know How {is?} to pArse", res);
+}
+
 TEST(SpellCheckerTest, AssignmentSampleText)
 {
    TextSpellChecker checker;

@@ -1,6 +1,8 @@
 
 # Spellchecker
 
+## Challenge
+
 Your goal is to implement a spelling checker. You should correct words
 by finding words in the dictionary that are no more than two edits away from the input.
 Here, an edit is either:
@@ -37,7 +39,9 @@ the in on fall falls his was
 \===
 
 hte rame in pain fells
+
 mainy oon teh lain
+
 was hints pliant
 
 \===
@@ -45,5 +49,33 @@ was hints pliant
 **Output**
 
 the {rame?} in pain falls
+
 {main mainly} on the plain
+
 was {hints?} plaint
+
+## Implementation
+
+The dictionary is placed into Trie structure: https://en.wikipedia.org/wiki/Trie.
+
+Step 1: create a collection of masks to represent possible edits. An unknown symbol is marked by ?.
+E.g. 'word' after 1 edit: '?word', 'w?ord', 'ord', 'wrd', 'wor'; after 2 edits: '?od', 'or', '?or?'.
+Let's the average word length is N. The number of the produced masks:
+
+- 2 insertions: N^2/2 (more precisely is (N+1)\*N/2 taking into account prohibition of consecutive insertions)
+- 2 deletions: N^2/2
+- 1 deletion and 1 insertion: N^2/2
+- 1 insertion: N
+- 1 deletion: N
+
+total is 3/2\*N/2 + 2\*N
+
+The average English word length is 5 symbols, resulting in 57 masks. Even less with double letters (e.g. "letter").
+
+Step 2: match every mask against the dictionary. An estimated number of operations
+
+- exact match: N\*log2(26)=5N, binary search in 26 letters at each tree level (worst case when the children collection in a node is full.)
+- with one arbitrary symbol: 26 + (N-1))\*log2(26)=5N+21
+- with two arbitrary symbols: 26^2 + (N-2))\*log2(26)=5N+666
+
+In reality only the 2 top tree levels are packed, and lower level child numbers quickly drop (almost halves going one level down). '??rd' is ~700 search operations, but 'wo??' is 2\*log2(26)+13\*6=88.
